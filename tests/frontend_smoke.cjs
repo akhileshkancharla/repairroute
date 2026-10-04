@@ -10,7 +10,7 @@ vm.runInNewContext(`${source}\nthis.parseCsvForTest = parseCsv;`, context);
 
 const example = fs.readFileSync(path.join(root, 'artifacts', 'sample_batch.csv'), 'utf8');
 const rows = context.parseCsvForTest(example);
-assert.equal(rows.length, 5);
+assert.equal(rows.length, 30);
 assert.equal(Object.keys(rows[0]).length, 170);
 assert.ok(Object.values(rows[0]).some(value => value === null));
 assert.throws(() => context.parseCsvForTest('a,b\n1,2'), /170 distinct/);

@@ -6,7 +6,7 @@ from functools import lru_cache
 import json
 import os
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -94,6 +94,7 @@ def metadata():
         "feature_count": len(model_artifact()["feature_columns"]),
         "model": metrics["model"],
         "score_label": "APS priority score",
+        "reference_threshold": metrics["validation_selected_threshold"],
         "fixed_test_policy": metrics["fixed_test_policy"],
         "test_accuracy": metrics["test_accuracy"],
         "test_balanced_accuracy": metrics["test_balanced_accuracy"],
@@ -170,10 +171,16 @@ def historical_curve(
 
 
 @app.get("/v1/sample-batch", include_in_schema=False)
-def sample_batch():
+def sample_batch(kind: Literal["mixed", "high", "borderline", "low"] = "mixed"):
+    filenames = {
+        "mixed": "sample_batch.csv",
+        "high": "sample_high_priority.csv",
+        "borderline": "sample_borderline.csv",
+        "low": "sample_low_priority.csv",
+    }
     return FileResponse(
-        ARTIFACTS / "sample_batch.csv", media_type="text/csv",
-        filename="repairroute-example-batch.csv",
+        ARTIFACTS / filenames[kind], media_type="text/csv",
+        filename=f"repairroute-sample-{kind}.csv",
     )
 
 

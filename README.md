@@ -41,6 +41,8 @@ Interactive API documentation is available at `http://127.0.0.1:8000/docs` while
 
 The scoring request is JSON: `{"records": [{"aa_000": 123, "ab_000": null, "...": 0}]}` with every official feature key present in each record. Use `artifacts/sample_batch.csv` as a complete schema example. Null represents a missing value. Scoring returns input indices, ranks, and model priority scores. It does not return a diagnosis or ground-truth label.
 
+The batch page offers four downloadable CSV examples: mixed (30 rows), higher priority, near the reference cutoff, and lower priority (20 rows each). They are curated from the held-out Scania test file by saved model score, with class labels removed. They demonstrate the upload workflow and are **not** a representative performance sample or a new evaluation. `/v1/sample-batch?kind=mixed|high|borderline|low` serves the files.
+
 The API reads saved artifacts at startup or on first request. Training does not run when the server receives requests. Set `REPAIRROUTE_CORS_ORIGINS` to a comma-separated list of allowed frontend origins when the frontend is hosted separately.
 
 ## Deploy on Render

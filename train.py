@@ -39,6 +39,23 @@ def read_scania(path: Path):
     return features, labels
 
 
+def write_demo_samples(features: pd.DataFrame, scores: np.ndarray, threshold: float):
+    """Export curated, unlabeled examples for trying the scoring workflow."""
+    ranked = np.argsort(-scores, kind="stable")
+    high = ranked[np.linspace(0, 399, 20, dtype=int)]
+    borderline = np.argsort(np.abs(scores - threshold), kind="stable")[:20]
+    low = ranked[np.linspace(8000, len(ranked) - 1, 20, dtype=int)]
+    mixed = np.concatenate([high[:10], borderline[:10], low[:10]])
+    np.random.default_rng(RANDOM_STATE).shuffle(mixed)
+    for name, indices in {
+        "sample_batch.csv": mixed,
+        "sample_high_priority.csv": high,
+        "sample_borderline.csv": borderline,
+        "sample_low_priority.csv": low,
+    }.items():
+        features.iloc[indices].to_csv(ARTIFACTS / name, index=False)
+
+
 def main():
     train_path = DATA / "aps_failure_training_set.csv"
     test_path = DATA / "aps_failure_test_set.csv"
@@ -91,7 +108,7 @@ def main():
             "is_aps": y_test.astype(int),
         }
     ).to_csv(ARTIFACTS / "historical_scores.csv", index=False)
-    x_test.head(5).to_csv(ARTIFACTS / "sample_batch.csv", index=False)
+    write_demo_samples(x_test, test_scores, threshold)
 
     metrics = {
         "training_rows": int(len(x_fit)),

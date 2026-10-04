@@ -1,6 +1,7 @@
 const $ = (id) => document.getElementById(id);
 const fmt = (value) => new Intl.NumberFormat('en-US').format(Math.round(value));
 const percent = (value) => `${(100 * value).toFixed(1)}%`;
+const scoreText = (value) => value > 0 && value < 0.000001 ? '<0.000001' : value.toFixed(6);
 const state = { metadata: null, curve: null, capacity: 597, queueExpanded: false, queueOffset: 0, scoreRows: [], selectedFile: null, requestId: 0 };
 
 async function api(path, options) {
@@ -81,7 +82,7 @@ function renderPlanner(decision, queue) {
   $('chart-cost').textContent = fmt(o.cost);
   $('chart-capacity').textContent = `at ${fmt(k)} inspections`;
   $('next-record').textContent = decision.next_record_id ? `Next in line: ${decision.next_record_id}` : 'Every record is selected';
-  tableRows($('queue-rows'), queue.records.length ? queue.records.map((r) => [String(r.rank).padStart(2, '0'), r.record_id, r.priority_score.toFixed(3)]) : [['—','No records selected','—']]);
+  tableRows($('queue-rows'), queue.records.length ? queue.records.map((r) => [String(r.rank).padStart(2, '0'), r.record_id, scoreText(r.priority_score)]) : [['—','No records selected','—']]);
   $('queue-expand').textContent = state.queueExpanded ? 'Show first five ←' : `View all ${fmt(k)} ranked records →`;
   $('queue-expand').disabled = k === 0;
   $('queue-pagination').classList.toggle('hidden', !state.queueExpanded || k <= 100);
@@ -194,9 +195,11 @@ async function scoreSelectedFile() {
       for(const item of batch.records)results.push({index:start+item.input_index,score:item.priority_score});
     }
     results.sort((a,b)=>b.score-a.score||a.index-b.index);
-    state.scoreRows=results.map((item,rank)=>({rank:rank+1,recordId:`UPLOAD-${String(item.index+1).padStart(5,'0')}`,score:item.score}));
-    tableRows($('result-rows'),state.scoreRows.slice(0,20).map(r=>[String(r.rank).padStart(2,'0'),r.recordId,r.score.toFixed(3),'Inspect in order']));
-    $('score-status').textContent=`Scored ${fmt(results.length)} records. Showing the first 20; download the complete ranked list.`;
+    const cutoff=state.metadata.reference_threshold;
+    state.scoreRows=results.map((item,rank)=>({rank:rank+1,recordId:`UPLOAD-${String(item.index+1).padStart(5,'0')}`,score:item.score,nextStep:item.score>=cutoff?'Prioritise APS check':'Lower APS priority'}));
+    tableRows($('result-rows'),state.scoreRows.slice(0,20).map(r=>[String(r.rank).padStart(2,'0'),r.recordId,scoreText(r.score),r.nextStep]));
+    const prioritised=state.scoreRows.filter(r=>r.score>=cutoff).length;
+    $('score-status').textContent=`Scored ${fmt(results.length)} records · ${fmt(prioritised)} above the reference cutoff · ${fmt(results.length-prioritised)} lower priority. ${results.length<=20?'All records shown.':'Top 20 shown; download the complete list.'}`;
     $('file-summary').textContent=`${fmt(results.length)} rows scored · Ready to download`;
     $('result-download').disabled=false;
   }catch(exc){error(`Batch could not be scored: ${exc.message}`);$('score-status').textContent='No results produced.';}
@@ -228,7 +231,7 @@ async function init() {
   zone.addEventListener('dragleave',()=>zone.classList.remove('dragover'));
   zone.addEventListener('drop',(event)=>{event.preventDefault();zone.classList.remove('dragover');onFile(event.dataTransfer.files[0]);});
   $('score-button').addEventListener('click',scoreSelectedFile);
-  $('result-download').addEventListener('click',()=>download('repairroute-scored-batch.csv','Rank,Record ID,APS priority score\n'+state.scoreRows.map(r=>`${r.rank},${r.recordId},${r.score}`).join('\n')));
+  $('result-download').addEventListener('click',()=>download('repairroute-scored-batch.csv','Rank,Record ID,APS priority score,Next step\n'+state.scoreRows.map(r=>`${r.rank},${r.recordId},${r.score},${r.nextStep}`).join('\n')));
   setView(location.hash.slice(1)||'planner');
   try{
     const [metadata,curve]=await Promise.all([api('/v1/metadata'),api('/v1/historical/curve?points=201&max_capacity=1600')]);
