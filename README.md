@@ -23,6 +23,23 @@ python -m uvicorn repairroute.api:app --reload
 
 The checked-in `artifacts/` directory contains the trained model and a compact scored historical test set. The raw Scania CSV files are not included in this repository.
 
+Interactive API documentation is available at `http://127.0.0.1:8000/docs` while the server runs.
+
+## API
+
+| Endpoint | Purpose |
+| --- | --- |
+| `GET /health` | Check that saved model and historical artifacts load. |
+| `GET /v1/metadata` | Fetch dataset size, fixed test result, and benchmark cost definitions. |
+| `GET /v1/historical/decision?capacity=597` | Simulate a chosen inspection capacity on held-out historical records. |
+| `GET /v1/historical/queue?capacity=597&limit=100&offset=0` | Fetch a page of selected records ranked by priority score; outcome labels are withheld. |
+| `GET /v1/historical/curve?points=201` | Fetch sampled cost and caught/missed fault counts across capacity levels. |
+| `POST /v1/score` | Score up to 1,000 new records with exactly the 170 anonymised Scania feature columns. |
+
+The scoring request is JSON: `{"records": [{"aa_000": 123, "ab_000": null, "...": 0}]}` with every official feature key present in each record. Use `artifacts/sample_batch.csv` as a complete schema example. Null represents a missing value. Scoring returns input indices, ranks, and model priority scores. It does not return a diagnosis or ground-truth label.
+
+The API reads saved artifacts at startup or on first request. Training does not run when the server receives requests. Set `REPAIRROUTE_CORS_ORIGINS` to a comma-separated list of allowed frontend origins when the frontend is hosted separately.
+
 ## Reproduce training and evaluation
 
 ```powershell
