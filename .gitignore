@@ -1,0 +1,8 @@
+.vendor/
+data/
+.ssh_known_hosts
+__pycache__/
+*.pyc
+.pytest_cache/
+.streamlit/secrets.toml
+

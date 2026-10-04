@@ -1,0 +1,33 @@
+{
+  "training_rows": 48000,
+  "validation_rows": 12000,
+  "test_rows": 16000,
+  "test_aps_faults": 375,
+  "validation_selected_capacity": 399,
+  "validation_selected_threshold": 0.022607538574107376,
+  "validation_policy": {
+    "inspections": 399,
+    "caught": 194,
+    "unnecessary": 205,
+    "missed": 6,
+    "cost": 5050,
+    "recall": 0.97,
+    "precision": 0.48621553884711777
+  },
+  "fixed_test_policy": {
+    "inspections": 597,
+    "caught": 350,
+    "unnecessary": 247,
+    "missed": 25,
+    "cost": 14970,
+    "recall": 0.9333333333333333,
+    "precision": 0.5862646566164154
+  },
+  "test_inspect_all_cost": 156250,
+  "test_inspect_none_cost": 187500,
+  "test_average_precision": 0.9171449438525642,
+  "test_roc_auc": 0.9949069653333333,
+  "model": "HistGradientBoostingClassifier",
+  "seed": 42,
+  "data_source": "UCI APS Failure at Scania Trucks, DOI 10.24432/C51S51"
+}
