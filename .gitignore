@@ -5,4 +5,6 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .streamlit/secrets.toml
-
+.codex-finalizer/
+pitch_preview/build/
+pitch_preview/reference/
