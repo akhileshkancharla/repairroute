@@ -15,7 +15,7 @@ On the separate 16,000-record test set, the validation-selected policy achieved 
 
 ## Run locally
 
-Use Python 3.11 or newer:
+Use Python 3.12:
 
 ```powershell
 python -m pip install -r requirements.txt
@@ -42,6 +42,10 @@ Interactive API documentation is available at `http://127.0.0.1:8000/docs` while
 The scoring request is JSON: `{"records": [{"aa_000": 123, "ab_000": null, "...": 0}]}` with every official feature key present in each record. Use `artifacts/sample_batch.csv` as a complete schema example. Null represents a missing value. Scoring returns input indices, ranks, and model priority scores. It does not return a diagnosis or ground-truth label.
 
 The API reads saved artifacts at startup or on first request. Training does not run when the server receives requests. Set `REPAIRROUTE_CORS_ORIGINS` to a comma-separated list of allowed frontend origins when the frontend is hosted separately.
+
+## Deploy on Render
+
+The root `render.yaml` defines one free Python web service for the website and API, with `/health` as its health check. Connect this GitHub repository to Render as a Blueprint and deploy the `main` branch. The `.python-version` and pinned dependencies match the tested model artifact. No database or scheduled training job is required; the committed artifacts are read by the service. Render's free web service can sleep after inactivity, so the first visit may take longer.
 
 To run the backend checks, use `python -m unittest discover -s tests`. The CSV parser check uses Node.js: `node tests/frontend_smoke.cjs`.
 

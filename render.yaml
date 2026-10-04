@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: repairroute
+    runtime: python
+    plan: free
+    repo: https://github.com/akhileshkancharla/repairroute
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn repairroute.api:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
