@@ -14,6 +14,8 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(meta["historical_records"], 16000)
         self.assertEqual(meta["feature_count"], 170)
         self.assertEqual(meta["fixed_test_policy"]["cost"], 14970)
+        self.assertAlmostEqual(meta["test_f1"], 0.720164609053498)
+        self.assertEqual(meta["test_confusion_matrix"]["false_negative"], 25)
 
     def test_decision_and_queue_use_same_capacity(self):
         decision = historical_decision(capacity=10)

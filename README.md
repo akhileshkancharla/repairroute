@@ -12,6 +12,8 @@ The dashboard will be designed separately.
 
 The dataset defines a cost of **10 units** for an unnecessary APS check and **500 units** for a missed APS-related fault. These are benchmark units, not verified money savings.
 
+On the separate 16,000-record test set, the validation-selected policy achieved 93.3% APS recall, 58.6% precision, 72.0% F1, and 98.3% accuracy. It incurred 14,970 benchmark cost units, versus 156,250 for inspecting every record and 187,500 for inspecting none. The full confusion matrix and ranking metrics are saved in `artifacts/metrics.json`.
+
 ## Run locally
 
 Use Python 3.11 or newer:

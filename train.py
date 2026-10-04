@@ -9,7 +9,16 @@ import joblib
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import HistGradientBoostingClassifier
-from sklearn.metrics import average_precision_score, roc_auc_score
+from sklearn.metrics import (
+    accuracy_score,
+    average_precision_score,
+    balanced_accuracy_score,
+    confusion_matrix,
+    f1_score,
+    precision_score,
+    recall_score,
+    roc_auc_score,
+)
 from sklearn.model_selection import train_test_split
 
 from repairroute.decision import capacity_curve, outcome_at_capacity, outcome_at_threshold
@@ -66,6 +75,10 @@ def main():
 
     test_scores = model.predict_proba(x_test)[:, 1]
     test_policy = outcome_at_threshold(test_scores, y_test, threshold)
+    test_predictions = test_scores >= threshold
+    true_negative, false_positive, false_negative, true_positive = confusion_matrix(
+        y_test, test_predictions, labels=[False, True]
+    ).ravel()
     all_cost = int(10 * np.count_nonzero(~y_test))
     none_cost = int(500 * np.count_nonzero(y_test))
 
@@ -93,6 +106,18 @@ def main():
         "test_inspect_none_cost": none_cost,
         "test_average_precision": float(average_precision_score(y_test, test_scores)),
         "test_roc_auc": float(roc_auc_score(y_test, test_scores)),
+        "test_accuracy": float(accuracy_score(y_test, test_predictions)),
+        "test_balanced_accuracy": float(balanced_accuracy_score(y_test, test_predictions)),
+        "test_precision": float(precision_score(y_test, test_predictions)),
+        "test_recall": float(recall_score(y_test, test_predictions)),
+        "test_f1": float(f1_score(y_test, test_predictions)),
+        "test_specificity": float(true_negative / (true_negative + false_positive)),
+        "test_confusion_matrix": {
+            "true_negative": int(true_negative),
+            "false_positive": int(false_positive),
+            "false_negative": int(false_negative),
+            "true_positive": int(true_positive),
+        },
         "model": "HistGradientBoostingClassifier",
         "seed": RANDOM_STATE,
         "data_source": "UCI APS Failure at Scania Trucks, DOI 10.24432/C51S51",

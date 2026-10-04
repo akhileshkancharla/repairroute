@@ -27,6 +27,18 @@
   "test_inspect_none_cost": 187500,
   "test_average_precision": 0.9171449438525642,
   "test_roc_auc": 0.9949069653333333,
+  "test_accuracy": 0.983,
+  "test_balanced_accuracy": 0.9587626666666667,
+  "test_precision": 0.5862646566164154,
+  "test_recall": 0.9333333333333333,
+  "test_f1": 0.720164609053498,
+  "test_specificity": 0.984192,
+  "test_confusion_matrix": {
+    "true_negative": 15378,
+    "false_positive": 247,
+    "false_negative": 25,
+    "true_positive": 350
+  },
   "model": "HistGradientBoostingClassifier",
   "seed": 42,
   "data_source": "UCI APS Failure at Scania Trucks, DOI 10.24432/C51S51"
