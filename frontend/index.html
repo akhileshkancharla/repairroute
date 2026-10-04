@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#142B36">
+  <meta name="description" content="RepairRoute ranks existing faulty trucks for APS inspection and makes capacity trade-offs visible.">
+  <title>RepairRoute · Inspection planner</title>
+  <link rel="icon" href="/static/assets/repairroute-logo-icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+      <a class="sidebar-brand" href="#planner" aria-label="RepairRoute home">
+        <img src="/static/assets/repairroute-logo-dark.svg" alt="RepairRoute">
+      </a>
+      <div class="nav-label">Workspace</div>
+      <nav class="nav-links">
+        <button class="nav-link active" type="button" data-view="planner"><span class="nav-icon">⌁</span><span>Inspection planner</span></button>
+        <button class="nav-link" type="button" data-view="batch"><span class="nav-icon">⇩</span><span>Score a batch</span></button>
+        <button class="nav-link" type="button" data-view="evidence"><span class="nav-icon">▮</span><span>Model evidence</span></button>
+      </nav>
+      <div class="sidebar-foot"><strong>Decision support</strong><br>Mechanic confirms the final APS diagnosis.</div>
+    </aside>
+
+    <div class="main-column">
+      <header class="topbar">
+        <div class="mobile-brand"><img src="/static/assets/repairroute-logo-horizontal.svg" alt="RepairRoute"></div>
+        <span id="topbar-title">Inspection planner</span>
+        <span class="topbar-context">Historical demo workspace</span>
+        <button id="menu-toggle" class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false">☰</button>
+      </header>
+
+      <main class="main-content">
+        <div id="global-error" class="error-banner hidden" role="alert"></div>
+
+        <section id="planner" class="view active" aria-labelledby="planner-title">
+          <div class="page-intro">
+            <div><h1 id="planner-title">Plan today’s APS inspections</h1><p>Prioritise existing faulty records within a limited inspection capacity.</p></div>
+            <span class="pill pill-teal">Historical simulation</span>
+          </div>
+
+          <div class="card batch-summary">
+            <div><span class="eyebrow">Historical batch</span><div class="summary-line"><strong id="batch-count">16,000</strong><span>faulty records</span></div></div>
+            <div><span class="eyebrow eyebrow-spacer">&nbsp;</span><div class="summary-line"><strong id="batch-aps">375</strong><span>APS-related faults</span></div></div>
+            <div class="batch-note"><strong>Saved batch · default scenario</strong><p>Only the planner results change with capacity.</p></div>
+          </div>
+
+          <div class="card capacity-card">
+            <div class="capacity-left">
+              <span class="eyebrow teal">Inspection capacity</span>
+              <div class="capacity-value"><output id="capacity-output" for="capacity-range">597</output><span>inspections</span><div class="capacity-buttons"><button id="capacity-down" type="button" aria-label="Remove one inspection slot">−</button><button id="capacity-up" type="button" aria-label="Add one inspection slot">+</button></div></div>
+              <input id="capacity-range" type="range" min="0" max="1600" value="597" aria-label="Inspection capacity">
+              <div class="range-labels"><span>0</span><span>800</span><span>1,600</span></div>
+            </div>
+            <div class="capacity-right"><span class="small-label">At this capacity</span><strong id="capacity-percent">3.7% of the historical batch</strong><p>The simulation shows caught faults, missed faults, and unnecessary checks. A mechanic confirms diagnosis.</p></div>
+          </div>
+
+          <div class="mobile-jump"><a href="#queue-section">Queue</a><span>•</span><a href="#chart-section">Chart</a><span>•</span><a href="#compare-section">Compare</a></div>
+
+          <div class="kpi-grid" aria-live="polite">
+            <div class="card kpi kpi-teal"><span>Selected inspections</span><strong id="kpi-inspections">597</strong><small>From 16,000 records</small></div>
+            <div class="card kpi kpi-green"><span>APS faults caught</span><strong id="kpi-caught">350</strong><small id="kpi-recall">93.3% of 375</small></div>
+            <div class="card kpi kpi-red"><span>APS faults missed</span><strong id="kpi-missed">25</strong><small>Historical simulation</small></div>
+            <div class="card kpi kpi-orange"><span>Unnecessary checks</span><strong id="kpi-unnecessary">247</strong><small>Selected non-APS records</small></div>
+          </div>
+
+          <div class="planner-main-grid">
+            <section class="card chart-card" id="chart-section" aria-labelledby="chart-heading">
+              <div class="section-head"><div><h2 id="chart-heading">Cost versus capacity</h2><p>Benchmark cost units · historical simulation</p></div><div class="chart-current"><strong id="chart-cost">14,970</strong><span id="chart-capacity">at 597 inspections</span></div></div>
+              <div class="chart-wrap"><svg id="cost-chart" viewBox="0 0 700 280" role="img" aria-label="Benchmark cost across inspection capacities"></svg></div>
+              <p class="chart-note">Curve computed from the held-out historical batch. The marker is your current capacity.</p>
+            </section>
+            <section class="card queue-card" id="queue-section" aria-labelledby="queue-heading">
+              <div class="section-head"><div><h2 id="queue-heading">Ranked inspection queue</h2><p>Inspect from the top. Scores support ordering only.</p></div></div>
+              <div class="table-scroll"><table><thead><tr><th>Rank</th><th>Record ID</th><th>APS priority score</th></tr></thead><tbody id="queue-rows"></tbody></table></div>
+              <div class="queue-actions"><span id="next-record">Next in line: —</span><button id="queue-expand" class="text-button" type="button">View all selected records →</button></div>
+              <div id="queue-pagination" class="pagination hidden"><button id="queue-prev" type="button">Previous</button><span id="queue-page-label"></span><button id="queue-next" type="button">Next</button><button id="queue-download" type="button">Download queue</button></div>
+            </section>
+          </div>
+
+          <section class="card compare-card" id="compare-section" aria-labelledby="compare-heading">
+            <h2 id="compare-heading">Compare inspection strategies</h2><p>Same historical batch · random selection is an expected-value estimate.</p>
+            <div class="table-scroll"><table><thead><tr><th>Strategy</th><th>Inspections</th><th>Caught</th><th>Missed</th><th>Unnecessary</th><th>Cost units</th></tr></thead><tbody id="comparison-rows"></tbody></table></div>
+          </section>
+        </section>
+
+        <section id="batch" class="view" aria-labelledby="batch-title">
+          <div class="page-intro"><div><h1 id="batch-title">Score a batch</h1><p>Upload existing faulty records and receive an ordered APS inspection queue.</p></div><span class="pill pill-blue">Batch workflow</span></div>
+          <section class="card upload-card"><div class="section-head"><div><h2>Upload Scania-format CSV</h2><p>One row per existing faulty record. The file is scored for inspection priority.</p></div><a class="outline-button" href="/v1/sample-batch" download>↓ &nbsp; Download example CSV</a></div>
+            <label class="drop-zone" id="drop-zone" for="batch-file"><span class="upload-icon">↑</span><strong>Drag a CSV here, or choose a file</strong><small>CSV only · anonymised records · 170 Scania feature columns</small></label>
+            <input id="batch-file" type="file" accept=".csv,text/csv" class="visually-hidden">
+          </section>
+          <section class="card selected-file"><div><span class="eyebrow">Current batch</span><strong id="file-name">No file selected</strong><p id="file-summary">Download the example CSV to try live scoring.</p></div><button id="score-button" class="primary-button" type="button" disabled>Score batch</button></section>
+          <section class="card result-card"><div class="section-head"><div><h2>Ranked result</h2><p>Results contain a score and rank, not a diagnosis.</p></div><button id="result-download" class="primary-button" type="button" disabled>↓ &nbsp; Download results</button></div><div id="score-status" class="status-line" role="status">Score a CSV to see the ordered queue.</div><div class="table-scroll"><table><thead><tr><th>Rank</th><th>Record ID</th><th>APS priority score</th><th>Next step</th></tr></thead><tbody id="result-rows"></tbody></table></div></section>
+        </section>
+
+        <section id="evidence" class="view" aria-labelledby="evidence-title">
+          <div class="evidence-hero"><span class="pill pill-hero">Fixed held-out evaluation</span><h1 id="evidence-title">Evidence for the APS prioritisation model</h1><p>This reference evaluation stays fixed while planner capacity changes.</p></div>
+          <section class="card evidence-metrics"><h2>Key metrics at the fixed reference operating point</h2><div class="evidence-kpi-grid"><div class="evidence-kpi border-green"><span>APS recall</span><strong id="evidence-recall">93.3%</strong><small>350 of 375 APS faults caught</small></div><div class="evidence-kpi border-blue"><span>Precision</span><strong id="evidence-precision">58.6%</strong><small>350 of 597 selected records</small></div><div class="evidence-kpi border-teal"><span>F1 score</span><strong id="evidence-f1">72.0%</strong><small>Balance of recall and precision</small></div></div></section>
+          <div class="evidence-grid"><section class="card matrix-card"><h2>Confusion matrix</h2><p>Fixed held-out test · 16,000 records</p><div class="matrix"><span></span><span>Actual APS</span><span>Actual other fault</span><span>Selected</span><div class="matrix-cell caught-bg"><strong id="matrix-tp">350</strong><small>Caught APS fault</small></div><div class="matrix-cell priority-bg"><strong id="matrix-fp">247</strong><small>Unnecessary check</small></div><span>Not selected</span><div class="matrix-cell missed-bg"><strong id="matrix-fn">25</strong><small>Missed APS fault</small></div><div class="matrix-cell neutral-bg"><strong id="matrix-tn">15,378</strong><small>Correctly skipped</small></div></div></section><section class="card source-card"><h2>Dataset source</h2><strong>APS Failure at Scania Trucks</strong><p>UCI Machine Learning Repository · Scania CV AB. The held-out test file contains 16,000 records.</p><hr><span class="eyebrow">Interpretation</span><p>The score ranks existing faulty trucks for APS inspection. It does not identify a faulty component or make a repair decision. A mechanic confirms the diagnosis.</p><a href="https://archive.ics.uci.edu/dataset/421/aps+failure+at+scania+trucks" target="_blank" rel="noopener">View dataset source ↗</a></section></div>
+          <section class="card limitations"><h2>Limitations and use</h2><div class="limitations-grid"><div><strong>Existing-fault scope</strong><p>This model is evaluated on records already known to be faulty.</p></div><div><strong>Historical context</strong><p>The planner explores capacity trade-offs on a saved historical batch.</p></div><div><strong>Missing values</strong><p>Source attributes may contain missing values; review data quality before use.</p></div><div><strong>Human decision</strong><p>Inspect in rank order, then follow workshop procedure for diagnosis.</p></div></div></section>
+        </section>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

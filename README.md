@@ -2,13 +2,12 @@
 
 RepairRoute ranks already-faulty trucks for Air Pressure System (APS) inspection. A manager chooses an inspection capacity and sees how that decision would have performed on held-out historical cases. The tool supports a mechanic's inspection decision; it does not diagnose a failed component or predict a future breakdown.
 
-## Current scope
+## Working product
 
 - A trained model and saved scores for a held-out historical test set.
 - Cost-aware capacity and threshold calculations.
-- A backend API for queue, policy evaluation, and scoring new records (in progress).
-
-The dashboard will be designed separately.
+- A backend API for queue, policy evaluation, and scoring new records.
+- A responsive three-view website based on the RepairRoute brand kit: inspection planner, batch scoring, and fixed model evidence.
 
 The dataset defines a cost of **10 units** for an unnecessary APS check and **500 units** for a missed APS-related fault. These are benchmark units, not verified money savings.
 
@@ -24,6 +23,8 @@ python -m uvicorn repairroute.api:app --reload
 ```
 
 The checked-in `artifacts/` directory contains the trained model and a compact scored historical test set. The raw Scania CSV files are not included in this repository.
+
+Open `http://127.0.0.1:8000/` for the website. The frontend calls the API on the same origin. Its capacity chart uses actual held-out test outcomes, while the model-evidence view shows the fixed validation-selected operating point.
 
 Interactive API documentation is available at `http://127.0.0.1:8000/docs` while the server runs.
 
@@ -41,6 +42,8 @@ Interactive API documentation is available at `http://127.0.0.1:8000/docs` while
 The scoring request is JSON: `{"records": [{"aa_000": 123, "ab_000": null, "...": 0}]}` with every official feature key present in each record. Use `artifacts/sample_batch.csv` as a complete schema example. Null represents a missing value. Scoring returns input indices, ranks, and model priority scores. It does not return a diagnosis or ground-truth label.
 
 The API reads saved artifacts at startup or on first request. Training does not run when the server receives requests. Set `REPAIRROUTE_CORS_ORIGINS` to a comma-separated list of allowed frontend origins when the frontend is hosted separately.
+
+To run the backend checks, use `python -m unittest discover -s tests`. The CSV parser check uses Node.js: `node tests/frontend_smoke.cjs`.
 
 ## Reproduce training and evaluation
 

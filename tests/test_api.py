@@ -4,7 +4,7 @@ from pathlib import Path
 import pandas as pd
 from fastapi import HTTPException
 
-from repairroute.api import ScoreRequest, health, historical_decision, historical_queue, metadata, score_batch
+from repairroute.api import ScoreRequest, health, historical_curve, historical_decision, historical_queue, metadata, sample_batch, score_batch, website
 
 
 class ApiTests(unittest.TestCase):
@@ -34,6 +34,14 @@ class ApiTests(unittest.TestCase):
             historical_decision(capacity=16001)
         with self.assertRaises(HTTPException):
             historical_queue(capacity=16001, limit=20, offset=0)
+
+    def test_frontend_and_curve_artifacts(self):
+        self.assertEqual(Path(website().path).name, "index.html")
+        self.assertEqual(Path(sample_batch().path).name, "sample_batch.csv")
+        curve = historical_curve(points=11, max_capacity=1600)
+        self.assertEqual(curve["max_capacity"], 1600)
+        self.assertEqual(curve["points"][0]["capacity"], 0)
+        self.assertEqual(curve["points"][-1]["capacity"], 1600)
 
     def test_live_scoring_and_schema_validation(self):
         sample = pd.read_csv(Path(__file__).resolve().parent.parent / "artifacts" / "sample_batch.csv")

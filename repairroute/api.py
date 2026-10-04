@@ -10,6 +10,8 @@ from typing import Any
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 import joblib
 import numpy as np
@@ -18,6 +20,7 @@ import pandas as pd
 from repairroute.decision import capacity_curve, outcome_at_capacity, random_expected_cost
 
 ARTIFACTS = Path(__file__).resolve().parent.parent / "artifacts"
+FRONTEND = Path(__file__).resolve().parent.parent / "frontend"
 MAX_BATCH_SIZE = 1000
 
 app = FastAPI(
@@ -34,10 +37,17 @@ if allowed_origins:
         allow_methods=["GET", "POST"],
         allow_headers=["Content-Type"],
     )
+if FRONTEND.exists():
+    app.mount("/static", StaticFiles(directory=FRONTEND), name="static")
 
 
 class ScoreRequest(BaseModel):
     records: list[dict[str, float | None]] = Field(min_length=1, max_length=MAX_BATCH_SIZE)
+
+
+@app.get("/", include_in_schema=False)
+def website():
+    return FileResponse(FRONTEND / "index.html")
 
 
 @lru_cache(maxsize=1)
@@ -140,11 +150,16 @@ def historical_queue(
 
 
 @app.get("/v1/historical/curve")
-def historical_curve(points: int = Query(default=201, ge=2, le=1001)):
+def historical_curve(
+    points: int = Query(default=201, ge=2, le=1001),
+    max_capacity: int | None = Query(default=None, ge=1),
+):
     ranked, _, curve = historical_data()
-    capacities = np.unique(np.linspace(0, len(ranked), num=points, dtype=int))
+    end = len(ranked) if max_capacity is None else min(max_capacity, len(ranked))
+    capacities = np.unique(np.linspace(0, end, num=points, dtype=int))
     return {
         "batch_size": len(ranked),
+        "max_capacity": end,
         "points": [
             {"capacity": int(k), "cost": int(curve["cost"][k]), "caught": int(curve["caught"][k]),
              "missed": int(curve["missed"][k])}
@@ -152,6 +167,14 @@ def historical_curve(points: int = Query(default=201, ge=2, le=1001)):
         ],
         "simulation": "retrospective on held-out historical records",
     }
+
+
+@app.get("/v1/sample-batch", include_in_schema=False)
+def sample_batch():
+    return FileResponse(
+        ARTIFACTS / "sample_batch.csv", media_type="text/csv",
+        filename="repairroute-example-batch.csv",
+    )
 
 
 @app.post("/v1/score")
