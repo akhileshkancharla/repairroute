@@ -1,0 +1,116 @@
+{
+  "splits": [
+    {
+      "split_seed": 42,
+      "iterations_120": {
+        "inspections": 399,
+        "caught": 194,
+        "unnecessary": 205,
+        "missed": 6,
+        "cost": 5050,
+        "recall": 0.97,
+        "precision": 0.48621553884711777
+      },
+      "iterations_200": {
+        "inspections": 495,
+        "caught": 196,
+        "unnecessary": 299,
+        "missed": 4,
+        "cost": 4990,
+        "recall": 0.98,
+        "precision": 0.39595959595959596
+      },
+      "cost_change_200_minus_120": -60
+    },
+    {
+      "split_seed": 17,
+      "iterations_120": {
+        "inspections": 512,
+        "caught": 192,
+        "unnecessary": 320,
+        "missed": 8,
+        "cost": 7200,
+        "recall": 0.96,
+        "precision": 0.375
+      },
+      "iterations_200": {
+        "inspections": 535,
+        "caught": 192,
+        "unnecessary": 343,
+        "missed": 8,
+        "cost": 7430,
+        "recall": 0.96,
+        "precision": 0.35887850467289717
+      },
+      "cost_change_200_minus_120": 230
+    },
+    {
+      "split_seed": 99,
+      "iterations_120": {
+        "inspections": 494,
+        "caught": 187,
+        "unnecessary": 307,
+        "missed": 13,
+        "cost": 9570,
+        "recall": 0.935,
+        "precision": 0.3785425101214575
+      },
+      "iterations_200": {
+        "inspections": 494,
+        "caught": 187,
+        "unnecessary": 307,
+        "missed": 13,
+        "cost": 9570,
+        "recall": 0.935,
+        "precision": 0.3785425101214575
+      },
+      "cost_change_200_minus_120": 0
+    },
+    {
+      "split_seed": 123,
+      "iterations_120": {
+        "inspections": 536,
+        "caught": 196,
+        "unnecessary": 340,
+        "missed": 4,
+        "cost": 5400,
+        "recall": 0.98,
+        "precision": 0.3656716417910448
+      },
+      "iterations_200": {
+        "inspections": 515,
+        "caught": 196,
+        "unnecessary": 319,
+        "missed": 4,
+        "cost": 5190,
+        "recall": 0.98,
+        "precision": 0.38058252427184464
+      },
+      "cost_change_200_minus_120": -210
+    },
+    {
+      "split_seed": 7,
+      "iterations_120": {
+        "inspections": 615,
+        "caught": 196,
+        "unnecessary": 419,
+        "missed": 4,
+        "cost": 6190,
+        "recall": 0.98,
+        "precision": 0.31869918699186994
+      },
+      "iterations_200": {
+        "inspections": 615,
+        "caught": 196,
+        "unnecessary": 419,
+        "missed": 4,
+        "cost": 6190,
+        "recall": 0.98,
+        "precision": 0.31869918699186994
+      },
+      "cost_change_200_minus_120": 0
+    }
+  ],
+  "mean_cost_change": -8.0,
+  "wins_for_200": 2
+}

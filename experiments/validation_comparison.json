@@ -1,0 +1,72 @@
+[
+  {
+    "model": "current HistGradientBoosting",
+    "validation_cost": 5050,
+    "inspections": 399,
+    "caught": 194,
+    "missed": 6,
+    "unnecessary": 205,
+    "average_precision": 0.890936879942328,
+    "fit_and_score_seconds": 0.07
+  },
+  {
+    "model": "LightGBM 200 trees / 31 leaves",
+    "validation_cost": 5240,
+    "inspections": 418,
+    "caught": 194,
+    "missed": 6,
+    "unnecessary": 224,
+    "average_precision": 0.9047654659485134,
+    "fit_and_score_seconds": 5.13
+  },
+  {
+    "model": "LightGBM 350 trees / 15 leaves",
+    "validation_cost": 5370,
+    "inspections": 431,
+    "caught": 194,
+    "missed": 6,
+    "unnecessary": 237,
+    "average_precision": 0.8959219780358144,
+    "fit_and_score_seconds": 6.18
+  },
+  {
+    "model": "LightGBM 150 trees / 63 leaves",
+    "validation_cost": 5620,
+    "inspections": 456,
+    "caught": 194,
+    "missed": 6,
+    "unnecessary": 262,
+    "average_precision": 0.9031751826983506,
+    "fit_and_score_seconds": 4.8
+  },
+  {
+    "model": "LightGBM 200 trees / positive weight 5",
+    "validation_cost": 5330,
+    "inspections": 427,
+    "caught": 194,
+    "missed": 6,
+    "unnecessary": 233,
+    "average_precision": 0.9064554489871761,
+    "fit_and_score_seconds": 5.29
+  },
+  {
+    "model": "LightGBM 200 trees / positive weight 20",
+    "validation_cost": 6160,
+    "inspections": 408,
+    "caught": 192,
+    "missed": 8,
+    "unnecessary": 216,
+    "average_precision": 0.8951983870160471,
+    "fit_and_score_seconds": 5.53
+  },
+  {
+    "model": "HistGradientBoosting 200 iterations",
+    "validation_cost": 4990,
+    "inspections": 495,
+    "caught": 196,
+    "missed": 4,
+    "unnecessary": 299,
+    "average_precision": 0.8914532551166641,
+    "fit_and_score_seconds": 4.35
+  }
+]

@@ -56,3 +56,9 @@ python train.py
 Dataset: [APS Failure at Scania Trucks, Scania CV AB, UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/421/aps+failure+at+scania+trucks), DOI [10.24432/C51S51](https://doi.org/10.24432/C51S51). The dataset's features are anonymised and may contain missing values. RepairRoute does not assign mechanical meanings to them. The source page lists the dataset under CC BY 4.0; attribution is retained here and in the app.
 
 This prototype demonstrates a decision workflow on historical data. Before operational use, the model would need validation on current fleet data, monitoring for drift, an integration with workshop records, and an accountable human inspection process.
+
+## Model improvement experiments
+
+The current model remains the deployed choice because it had the lowest validation benchmark cost among the tested LightGBM variants: 5,050 units versus 5,240–6,160. A 200-iteration version of the same histogram boosting model achieved 4,990 on the original validation split, but a five-split stability check found a mean change of only −8 units, with two wins, one loss, and two ties. That gain is too small and inconsistent to justify replacing the tested model during this build.
+
+The experiments use only the official training file and are recorded in `experiments/validation_comparison.json` and `experiments/stability_results.json`. To rerun the optional LightGBM comparison, install `lightgbm` in addition to the main requirements, then run `python -m experiments.compare_models`. The stability check uses the main requirements: `python -m experiments.check_stability`.
